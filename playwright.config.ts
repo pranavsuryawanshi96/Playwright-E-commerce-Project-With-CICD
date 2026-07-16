@@ -23,7 +23,11 @@ export default defineConfig({
   },
 
   // Reporter configuration (moved out of projects)
-  reporter: [["html", { outputFolder: "reports/playwright-report" }]],
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "reports/playwright-report" }],
+    ["json", { outputFile: "results/playwright-report.json" }],
+  ],
 
   // Static Projects configuration for each browser
   projects: [
