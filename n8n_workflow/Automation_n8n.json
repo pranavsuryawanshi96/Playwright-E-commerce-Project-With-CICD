@@ -1,0 +1,429 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "playwright-test",
+        "options": {}
+      },
+      "id": "cf3e2585-8030-435b-9014-aa5f99add83d",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        -544
+      ],
+      "webhookId": "504d25ec-9c39-42c7-8586-9b5fc4ed1315"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are the Main QA Manager Agent.\n\nYour job is to decide which specialist agent should perform the task.\n\nAvailable tools:\n\n1. QA Analysis Agent\n2. Bug Report Agent\n3. Notification Agent\n\nAlways use the appropriate tool based on the user's request.\nUser request fields:  \nrepository: {{ $json.body.repository }}\nstatus: {{ $json.body.status }}\nrun_ id:{{ $json.body.run_id }}\nplaywrightLogs: {{ $json.body.playWrightLogs }}\nYou are the Main QA Orchestrator.\n\nWhen Playwright logs are received:\n\n1. Call the QA Analysis Agent to analyze the failure.\n2. After receiving its response, call the Bug Report Agent to create a professional bug report.\n3. After the bug report is created, call the Notification Agent to email the report.\n\nAlways execute all three agents in this order.\nDo not stop after the first agent.\n",
+        "options": {}
+      },
+      "id": "c97fd5fb-adb8-4fa1-a669-6b6ba2ec8c1a",
+      "name": "Main AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -240,
+        -544
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "id": "8995aef1-cf3b-4360-8138-239fd7916649",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -400,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "QA Analysis Agent",
+        "text": "You are a QA Analysis Agent.\n\nAnalyze Playwright logs.\n\nFind:\n\n- Root Cause\n- Failure Reason\n- Possible Fix\n\nReturn the result in clear English.",
+        "options": {}
+      },
+      "id": "1734a412-efe3-405a-a4de-41eebee22876",
+      "name": "QA Analysis Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        -256,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Bug Report Agent",
+        "text": "=You are a QA Bug Report Agent.\n\nAnalyze the Playwright test failure logs provided below and generate a professional bug report.\n\nPlaywright Logs:\n{{ $json.body.playwrightLogs }}\n\nRepository:\n{{ $json.body.repository }}\n\nBranch:\n{{ $json.body.branch }}\n\nRun ID:\n{{ $json.body.run_id }}\n\nCreate a bug report with the following sections:\n\n1. Title\n2. Severity\n3. Priority\n4. Test Case\n5. Steps to Reproduce\n6. Expected Result\n7. Actual Result\n8. Root Cause Analysis\n9. Suggested Fix\n10. Recommendation\n\nIf the logs are incomplete, clearly mention what information is missing instead of making assumptions.",
+        "options": {}
+      },
+      "id": "e137a90e-1b8a-48ad-a996-16d36156302a",
+      "name": "Bug Report Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        32,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "id": "f874b51f-3c4b-401b-8e9e-a77fbb0d98ad",
+      "name": "Simple Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -80,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "id": "aac5d778-e387-4afc-9ece-02855116a5ee",
+      "name": "Simple Memory2",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        144,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}"
+      },
+      "id": "d9084d23-8c8e-4c50-9693-364564016495",
+      "name": "Simple Memory3",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Notification Agent",
+        "text": "You are a Notification Agent.\n\nYour task is to send an email to the developer using the Gmail tool.\n\nAlways use the Gmail tool.\n\nCreate a professional email based on the bug report.\n\nInclude:\n\n- Test Name\n- Failure Reason\n- Bug Summary\n- Root Cause\n- Suggested Fix\n\nUse a professional subject line:\n\"Playwright Test Failure Report\"\n\nGenerate the email body and send it using the Gmail tool.",
+        "options": {}
+      },
+      "id": "6bb07463-f958-4f48-b8b9-21d3662447e9",
+      "name": "Notification Agent",
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        368,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "shrutikumari1511@gmail.com",
+        "subject": "Automation Output",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "id": "71c816d3-6146-4eb8-afd3-be0c18b589b5",
+      "name": "Send a message in Gmail",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        -144
+      ],
+      "webhookId": "aae8349f-d1b8-40d9-a513-485d6c33536e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "aFpDcIDszNR1Nj33",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -656,
+        -320
+      ],
+      "id": "8b7647d1-75bc-4351-b7ba-0a68f1cf80f4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        -96
+      ],
+      "id": "9c178d59-9c62-447a-a2ef-cfe7c7525bb9",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        -16
+      ],
+      "id": "a0b0fb4f-d141-4b63-ba62-5afa6f394284",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        -64
+      ],
+      "id": "13d5d070-41f1-4aff-88d6-97dfebbc816d",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "QA Analysis Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bug Report Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "QA Analysis Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Bug Report Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "Notification Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notification Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Notification Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "QA Analysis Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Bug Report Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Notification Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d67c771d-cb06-4a1d-8332-e5858f41f6cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "337ca2fc4f793a9e7a63227e11865a5ebfd0b01a2f399645f4076f6585f9dacd"
+  },
+  "nodeGroups": [],
+  "id": "WN6XhoAcx1d6CTQq",
+  "tags": []
+}

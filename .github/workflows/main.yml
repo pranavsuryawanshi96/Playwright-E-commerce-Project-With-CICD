@@ -42,3 +42,29 @@ jobs:
         with:
           name: test-results
           path: automation/test-results
+
+      - name: Notify n8n
+        if: always()
+        run: |
+          ERROR_FILE=$(find automation/test-results -name "error-context.md" | head -1)
+          if [ -z "$ERROR_FILE" ]; then
+            ERROR_FILE=/dev/null
+          fi
+
+          JSON_PAYLOAD=$(jq -n \
+            --arg repo "${{ github.repository }}" \
+            --arg status "${{ job.status }}" \
+            --arg run_id "${{ github.run_id }}" \
+            --arg branch "${{ github.head_ref || github.ref_name }}" \
+            --rawfile log_data "$ERROR_FILE" \
+            '{
+              repository: $repo,
+              status: $status,
+              run_id: $run_id,
+              branch: $branch,
+              playWrightLogs: $log_data
+            }')
+
+          curl -X POST -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD" \
+            https://pranavpatil241.app.n8n.cloud/workflow/M89kcZDHOydBewcR?projectId=7TmF978weCNqFf5y
