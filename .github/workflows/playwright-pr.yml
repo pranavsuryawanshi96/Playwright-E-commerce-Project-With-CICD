@@ -97,16 +97,6 @@ jobs:
           path: test-results
           if-no-files-found: ignore
 
-      - name: 🐍 Setup Python
-        if: always()
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
-      - name: 📄 Generate Summary
-        if: always()
-        run: python parse_playwright_report.py
-
       - name: 💬 Post PR Comment
         if: always()
         uses: actions/github-script@v7
