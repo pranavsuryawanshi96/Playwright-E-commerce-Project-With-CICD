@@ -6,7 +6,7 @@ export type UserCredentials = {
 export const users = {
   validUser: {
     email: "pranavpatil@patil.co.in",
-    password: "Test@969",
+    password: "Test@9696",
   },
   invalidUser: {
     email: "invalid@email.com",
