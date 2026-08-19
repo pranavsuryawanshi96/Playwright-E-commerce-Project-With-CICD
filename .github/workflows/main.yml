@@ -65,6 +65,12 @@ jobs:
               playWrightLogs: $log_data
             }')
 
-          curl -X POST -H "Content-Type: application/json" \
-            -d "$JSON_PAYLOAD" \
-            https://pranavpatil241.app.n8n.cloud/workflow/M89kcZDHOydBewcR?projectId=7TmF978weCNqFf5y
+           curl -X POST "https://pranavpatil241.app.n8n.cloud/webhook/playwright-test" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg repository "$GITHUB_REPOSITORY" \
+              --arg branch "$GITHUB_REF_NAME" \
+              --arg run_id "$GITHUB_RUN_ID" \
+              --arg status "failed" \
+              --rawfile playwrightLogs playwright-log.txt \
+              '{repository:$repository, branch:$branch, run_id:$run_id, status:$status, playwrightLogs:$playwrightLogs}')"
