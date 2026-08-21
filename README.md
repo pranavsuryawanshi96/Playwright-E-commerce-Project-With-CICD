@@ -1,8 +1,19 @@
 # E-Commerce_Playwright
 
 An End to End Script for E-Commerce Website for Registration and Login Modules
+## 🔄 Project Workflow
 
-http://www.automationexcercise.com
+### ⏩ Step-by-Step Execution Process
+
+1. 💻 **Code Commit:** Developer pushes new code.
+2. 🚀 **CI/CD Trigger:** GitHub Actions starts the pipeline.
+3. 🎭 **Test Run:** Playwright executes tests.
+4. 🚨 **Failure Hook:** Failed test triggers n8n.
+5. 🔍 **Artifact Capture:** Logs and screenshots are collected.
+6. 🧠 **AI Diagnosis:** OpenAI analyzes the failure.
+7. 📄 **RCA Generation:** RCA report is created.
+8. 📧 **Alerting:** Email is sent to developers.
+
 
 Part 1 Web Automation :
 
